@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>地理位置</title>
+    <style>
+    #t1{
+        width: 100%;
+        height: 500px;
+    }
+    </style>
+</head>
+<body>
+    <h1>
+        位置来源：
+        1.IP，2.GPS全球定位，2.WiFi无线网络，4.基站
+    </h1>
+    <div>
+        地理位置对象：navigator.geolocation 有三个方法
+        <p>
+            1.单次定位请求：getCurrentPosition(请求成功，请求失败，数据收集方式)
+        </p>
+        请求成功<br/>
+            coords.latitude	纬度数值<br/>
+            coords.longitude	经度数值<br/>
+            coords.altitude	参考椭球之上的高度<br/>
+            coords.accuracy	精确度<br/>
+            coords.altitudeAccuracy	高度的精确度<br/>
+            coords.heading	设备正北顺时针前进的方位<br/>
+            coords.speed	设备外部环境的移动速度(m/s)<br/>
+            timestamp	当位置捕获到时的时间戳<br/><br/>
+        请求失败<br/>
+            >> 失败编号：<br/>
+            >> 0:不包括其他错误编号中的错误<br/>
+            >> 1:用户拒绝浏览器获取位置信息<br/>
+            >> 2:尝试获取用户信息，但失败了<br/>
+            >> 3:设置了timeout,获取位置超时<br/><br/>
+        数据接受：json的形式<br/>
+            >> enableHighAcuracy:更精确查找，默认false<br/>
+            >> timeout:获取位置允许最长事件。默认infinity<br/>
+            >> maximunAge:位置可以缓存的最大时间，默认0<br/>
+        <p>
+            2.多次定位请求：watchPosition(与setInterval相似)
+        </p>    
+            >> 移动设备有用：位置改变才会触发<br/>
+            >> 配置参数：frequency更新的频率
+        <p>
+            3.关闭更新请求：clearWatch(与clearInterval相似)
+        </p>
+    </div><br/><br/>
+    <div>
+        <button id="btn">请求</button>
+        <div id="t1"></div>
+        <!--<textarea name="positon" id="t1" cols="30" rows="10"></textarea>-->
+    </div>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=s1jMyD0GuvICkrVzbikrTanLyxrWNc1i"></script>
+    <script>
+        window.onload = function(){
+            var obtn = document.getElementById('btn'),
+                otextarea = document.getElementById('t1');
+                obtn.onclick = function(){
+                    console.log(navigator);
+                    console.log(navigator.geolocation);
+                    navigator.geolocation.getCurrentPosition(success,err,colect);
+                }
+
+                function success(positon){
+                        var x = positon.coords.latitude,
+                            y = positon.coords.longitude,
+                            map = new BMap.Map("t1"),
+                            point = new BMap.Point(y, x);
+                        map.centerAndZoom(point, 30);
+
+                        //创建小狐狸
+                        var pt = new BMap.Point(y, x);
+                        var myIcon = new BMap.Icon("http://developer.baidu.com/map/jsdemo/img/fox.gif", new BMap.Size(300,157));
+                        var marker2 = new BMap.Marker(pt,{icon:myIcon});  // 创建标注
+                        map.addOverlay(marker2);   // 将标注添加到地图中
+                        var opts = {
+                            width : 200,     // 信息窗口宽度
+                            height: 100,     // 信息窗口高度
+                            title : "中海西岸华府" , // 信息窗口标题
+                            enableMessage:true,//设置允许信息窗发送短息
+                            message:"亲耐滴，晚上一起吃个饭吧？戳下面的链接看下地址喔~"
+                         }
+                         var infoWindow = new BMap.InfoWindow("地址：中海西岸华府88号乐天银泰百货八层", opts);  // 创建信息窗口对象 
+                         marker2.addEventListener("click", function(){          
+                             map.openInfoWindow(infoWindow,point); //开启信息窗口
+                         });
+                        // marker2.disableDragging(); 
+                        // otextarea.innerHTML = '<br/>' +'纬度数值' + positon.coords.latitude + '<br/><br/>' +
+                        //     '经度数值'  + positon.coords.longitude + '<br/><br/>' +
+                        //     '参考椭球之上的高度'  + positon.coords.altitude + '<br/><br/>' +
+                        //     '精确度'  + positon.coords.accuracy + ' ' + 
+                        //     '高度的精确度'  + positon.coords.altitudeAccuracy + '<br/><br/>' +
+                        //     '设备正北顺时针前进的方位'  + positon.coords.heading + '<br/><br/>' +
+                        //     '设备外部环境的移动速度(m/s)'  + positon.coords.speed + '<br/><br/>' +
+                        //     '当位置捕获到时的时间戳'  + positon.timestamp ;
+                }
+                function err(err){
+                    console.log(err);
+                    otextarea.innerHTML = 'err: ' + err.code;
+
+                }
+                var colect = {
+                    enableHighAcuracy:true,
+                    timeout:3000,
+                    maximunAge:0
+                }
+        }
+    </script>
+</body>
+</html>
